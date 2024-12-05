@@ -1,0 +1,21 @@
+{
+  "name": "backend-avroom-rent",
+  "version": "1.0.0",
+  "description": "Backend of AVRoom Rent",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.1",
+    "typescript": "^5.7.2"
+  },
+  "devDependencies": {
+    "@types/typescript": "^2.0.0",
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.7"
+  }
+}
