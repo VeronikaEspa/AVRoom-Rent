@@ -1,6 +1,5 @@
 // Dispositivos
 import { UUIDTypes, v4 as uuidv4 } from 'uuid';
-
 import mongoose, { Schema, Document } from 'mongoose';
 
 export enum Role {

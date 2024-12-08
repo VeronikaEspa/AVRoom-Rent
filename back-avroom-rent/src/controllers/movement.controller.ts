@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { Movement } from '../models/movement.model';
 import { Device } from '../models/device.model';
 import { logger } from '../config/logger.config';
+import { User } from '../models/user.model';
 
 export const getAllMovement = async (
   _req: Request,
@@ -27,6 +28,50 @@ export const getAllMovementByUser = async (
   } catch (error) {
     logger.error(`Error al obtener movimientos para el usuario ${id}`, error);
     res.status(500).json({ message: 'Error al obtener movimientos', error });
+  }
+};
+
+export const getAllMovementByDevice = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  const { id } = req.params;
+
+  if (!id) {
+    res.status(400).json({ message: 'El ID del dispositivo es requerido.' });
+    return;
+  }
+
+  try {
+    const movements = await Movement.find({ idDevice: id }).exec();
+
+    if (!movements || movements.length === 0) {
+      res.status(404).json({
+        message: 'No se encontraron movimientos para este dispositivo.',
+      });
+      return;
+    }
+
+    const movementsWithDetails = await Promise.all(
+      movements.map(async movement => {
+        const user = await User.findOne({ id: movement.idUser }).exec();
+        const device = await Device.findOne({ id: movement.idDevice }).exec();
+
+        return {
+          ...movement.toObject(),
+          userName: user?.username || 'Usuario no encontrado',
+          deviceName: device?.name || 'Dispositivo no encontrado',
+        };
+      }),
+    );
+
+    res.status(200).json(movementsWithDetails);
+  } catch (error) {
+    logger.error(
+      `Error al obtener movimientos para el dispositivo con id ${id}`,
+      error,
+    );
+    res.status(500).json({ message: 'Error al obtener los movimientos' });
   }
 };
 

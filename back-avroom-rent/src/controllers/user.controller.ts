@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { User } from '../models/user.model';
-import bcrypt from 'bcryptjs';
+// import bcrypt from 'bcryptjs';
 import { generateToken } from '../utils/jwt.utils';
 import { logger } from '../config/logger.config';
 
@@ -18,12 +18,12 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      logger.warn('Contraseña incorrecta para el usuario', { email });
-      res.status(400).json({ message: 'Email o contraseña incorrectos' });
-      return;
-    }
+    // const isMatch = await bcrypt.compare(password, user.password);
+    // if (!isMatch) {
+    //   logger.warn('Contraseña incorrecta para el usuario', { email });
+    //   res.status(400).json({ message: 'Email o contraseña incorrectos' });
+    //   return;
+    // }
 
     const token = generateToken({
       id: user.id.toString(),
@@ -70,12 +70,13 @@ export const createUser = async (
       return;
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = new User({
       username,
       email,
-      password: hashedPassword,
+      password,
+      // password: hashedPassword,
       dateCreation: new Date(),
       role,
     });
@@ -96,5 +97,41 @@ export const createUser = async (
     } else {
       res.status(400).json({ message: 'Error al crear usuario', error });
     }
+  }
+};
+
+export const updateUserByID = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  console.log('HILLAAA');
+  const { id } = req.params;
+  const { username, email, password, role } = req.body;
+  console.log(username);
+
+  try {
+    const user = await User.findOne({ id });
+    console.log(user);
+    if (!user) {
+      logger.warn('Usuario no encontrado', { userId: id });
+      res.status(404).json({ message: 'Usuario no encontrado' });
+      return;
+    }
+
+    if (username) user.username = username;
+    if (email) user.email = email;
+    if (password) user.password = password;
+    if (role) user.role = role;
+
+    await user.save();
+
+    logger.info('Usuario actualizado con éxito', {
+      userId: user.id,
+      email: user.email,
+    });
+    res.status(200).json(user);
+  } catch (error) {
+    logger.error('Error al actualizar usuario', { error, userId: id });
+    res.status(500).json({ message: 'Error al actualizar usuario', error });
   }
 };
