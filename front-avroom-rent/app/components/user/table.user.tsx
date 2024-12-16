@@ -1,10 +1,10 @@
 import React from "react";
 import { HiChevronRight } from "react-icons/hi";
 import Link from "next/link";
-import { User } from "@/app/utils/types/user.types";
+import { IUser } from "@/app/utils/types/user.types";
 
 interface UsersTableProps {
-  users: User[];
+  users: IUser[];
 }
 
 export const UsersTable: React.FC<UsersTableProps> = ({ users }) => {

@@ -1,186 +1,158 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
-import { getDeviceMovements } from "@/app/api/movement/movement.api";
+import { useState, useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { Device } from "@/app/utils/types/device.types";
+import { IMovementWithUsername } from "@/app/utils/types/movement.types";
+import { Role } from "@/app/utils/types/user.types";
 
-export default function DeviceMovements() {
-  const [movements, setMovements] = useState<any[]>([]);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
+export default function DeviceDetailsPage({ userRole }: { userRole: Role }) {
   const { id } = useParams();
-  const idDevice = id;
+  const router = useRouter();
+  const [device, setDevice] = useState<Device | null>(null);
+  const [movements, setMovements] = useState<IMovementWithUsername[]>([]);
+  const [activeTab, setActiveTab] = useState("detalles");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (!idDevice) return;
-
-    const fetchMovements = async () => {
-      setIsLoading(true);
+    const fetchDeviceData = async () => {
       try {
-        const data = await getDeviceMovements(idDevice as string);
-
-        if (Array.isArray(data)) {
-          setMovements(data);
-          setErrorMessage(null);
-        } else {
-          setErrorMessage("No se pudieron cargar los movimientos.");
+        if (!id) {
+          setErrorMessage("ID de dispositivo no válido.");
+          return;
         }
+
+        const [deviceResponse, movementsResponse] = await Promise.all([
+          fetch(`/api/device/read?id=${id}`).then((res) => res.json()),
+          fetch(`/api/device/${id}/movement`).then((res) => res.json()),
+        ]);
+
+        setDevice(deviceResponse);
+        setMovements(movementsResponse);
       } catch (error) {
-        console.error("Error al obtener los movimientos:", error);
-        setErrorMessage("No se pudieron cargar los movimientos.");
+        console.error("Error al cargar datos del dispositivo:", error);
+        setErrorMessage("No se pudieron cargar los datos del dispositivo.");
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchMovements();
-  }, [idDevice]);
+    fetchDeviceData();
+  }, [id]);
 
-  const openForm = () => setIsFormOpen(true);
-  const closeForm = () => setIsFormOpen(false);
+  const handleTabClick = (tab: string) => setActiveTab(tab);
 
-  const renderTable = () => (
-    <div className="overflow-x-auto rounded shadow-lg bg-white mt-4">
-      <table className="table-auto w-full border-collapse text-sm">
-        <thead className="bg-gray-300 uppercase">
-          <tr>
-            <th className="px-4 py-2 text-left">Nombre de Usuario</th>
-            <th className="px-4 py-2 text-left">Fecha de Préstamo</th>
-            <th className="px-4 py-2 text-left">Fecha Esperada de Devolución</th>
-            <th className="px-4 py-2 text-left">Fecha Real de Devolución</th>
-            <th className="px-4 py-2 text-left">Estado</th>
-          </tr>
-        </thead>
-        <tbody>
-          {movements.map((movement, index) => (
-            <tr
-              key={index}
-              className={`border-b ${
-                index % 2 === 0 ? "bg-white" : "bg-gray-50"
-              } hover:bg-gray-100`}
-            >
-              <td className="px-4 py-3 truncate">{movement.userName}</td>
-              <td className="px-4 py-3">
-                {new Date(movement.loanDate).toLocaleDateString()}
-              </td>
-              <td className="px-4 py-3">
-                {new Date(movement.returnDateExpected).toLocaleDateString()}
-              </td>
-              <td className="px-4 py-3">
-                {movement.returnDateActual
-                  ? new Date(movement.returnDateActual).toLocaleDateString()
-                  : "No Devuelto"}
-              </td>
-              <td className="px-4 py-3">
-                <span
-                  className={`px-2 py-1 rounded text-sm ${
-                    movement.loanStatus === "active"
-                      ? "bg-yellow-100 text-yellow-800"
-                      : "bg-green-100 text-green-800"
-                  }`}
-                >
-                  {movement.loanStatus === "active" ? "Activo" : "Devuelto"}
-                </span>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-
-  const renderForm = () => (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-      <div className="bg-white p-6 rounded shadow-lg w-[90%] max-w-md">
-        <h2 className="text-lg font-bold mb-4">Agregar Nuevo Movimiento</h2>
-        <form>
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">
-              Nombre de Usuario
-            </label>
-            <input
-              type="text"
-              placeholder="Ingrese el nombre del usuario"
-              className="mt-1 px-3 py-2 border rounded w-full"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">
-              Fecha de Préstamo
-            </label>
-            <input
-              type="date"
-              className="mt-1 px-3 py-2 border rounded w-full"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">
-              Fecha Esperada de Devolución
-            </label>
-            <input
-              type="date"
-              className="mt-1 px-3 py-2 border rounded w-full"
-            />
-          </div>
-          <div className="flex justify-end gap-4">
-            <button
-              type="button"
-              onClick={closeForm}
-              className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 bg-primaryColor text-white rounded hover:bg-primaryColorDark"
-            >
-              Guardar
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
+  if (isLoading) return <p className="text-center text-gray-500">Cargando...</p>;
+  if (errorMessage) return <p className="text-center text-red-500">{errorMessage}</p>;
 
   return (
-    <div className="p-4">
-      <h1 className="text-xl uppercase text-center font-bold text-gray-700 mb-4">
-        Movimientos del Dispositivo
-      </h1>
+    <div className="p-6">
+      <h1 className="text-xl font-bold text-gray-700 mb-4">Detalles del Dispositivo</h1>
 
-      {isLoading && <p className="text-center text-gray-500">Cargando...</p>}
-      {errorMessage && (
-        <p className="text-center text-red-500">{errorMessage}</p>
-      )}
+      <div className="flex gap-4 border-b border-primaryColor mb-6">
+        <button
+          onClick={() => handleTabClick("detalles")}
+          className={`px-4 py-2 font-medium transition-all duration-300 border rounded-t ${
+            activeTab === "detalles"
+              ? "bg-white border-primaryColor text-black"
+              : "bg-gray-100 text-gray-500 hover:text-black"
+          }`}
+        >
+          Detalles
+        </button>
+        <button
+          onClick={() => handleTabClick("movimientos")}
+          className={`px-4 py-2 font-medium transition-all duration-300 border rounded-t ${
+            activeTab === "movimientos"
+              ? "bg-white border-primaryColor text-black"
+              : "bg-gray-100 text-gray-500 hover:text-black"
+          }`}
+        >
+          Movimientos
+        </button>
+      </div>
 
-      {!isLoading && !errorMessage && movements.length === 0 && (
-        <div className="text-center mt-6">
-          <p className="text-gray-500">No hay movimientos registrados aún.</p>
-          <button
-            onClick={openForm}
-            className="mt-4 px-4 py-2 bg-primaryColor text-white rounded hover:bg-primaryColorDark focus:outline-none"
-          >
-            Agregar Movimiento
-          </button>
+      {activeTab === "detalles" && device && (
+        <div className="bg-white shadow-lg rounded-lg p-6">
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">{device.name}</h2>
+          <p className="text-gray-600 mb-6">{device.description}</p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <strong className="block text-gray-700">Categoría:</strong>
+              <span>{device.category}</span>
+            </div>
+            <div>
+              <strong className="block text-gray-700">Disponibilidad:</strong>
+              <span>{device.available ? "Disponible" : "No disponible"}</span>
+            </div>
+          </div>
+
+          {userRole === Role.ADMIN && (
+            <div className="flex justify-end mt-6">
+              <button
+                onClick={() => router.push(`/device/${id}/details`)}
+                className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+              >
+                Editar Dispositivo
+              </button>
+            </div>
+          )}
         </div>
       )}
 
-      {movements.length > 0 && (
-        <>
-          <div className="mb-4">
-            <button
-              onClick={openForm}
-              className="px-4 py-2 bg-primaryColor text-white rounded hover:bg-primaryColorDark"
-            >
-              Agregar Movimiento
-            </button>
-          </div>
-          {renderTable()}
-        </>
+      {activeTab === "movimientos" && (
+        <div className="overflow-x-auto rounded shadow-lg bg-white mt-4">
+          <table className="table-auto w-full border-collapse text-sm">
+            <thead className="bg-gray-300 uppercase">
+              <tr>
+                <th className="px-4 py-2 text-left">Usuario</th>
+                <th className="px-4 py-2 text-left">Fecha Préstamo</th>
+                <th className="px-4 py-2 text-left">Fecha Esperada Devolución</th>
+                <th className="px-4 py-2 text-left">Fecha Real Devolución</th>
+                <th className="px-4 py-2 text-left">Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              {movements.map((movement, index) => (
+                <tr
+                  key={index}
+                  className={`border-b ${index % 2 === 0 ? "bg-white" : "bg-gray-50"}`}
+                >
+                  <td className="px-4 py-3 truncate">{movement.username || "Desconocido"}</td>
+                  <td className="px-4 py-3">
+                    {movement.loanDate
+                      ? new Date(movement.loanDate).toLocaleDateString()
+                      : "-"}
+                  </td>
+                  <td className="px-4 py-3">
+                    {movement.returnDateExpected
+                      ? new Date(movement.returnDateExpected).toLocaleDateString()
+                      : "-"}
+                  </td>
+                  <td className="px-4 py-3">
+                    {movement.returnDateActual
+                      ? new Date(movement.returnDateActual).toLocaleDateString()
+                      : "No devuelto"}
+                  </td>
+                  <td className="px-4 py-3">
+                    <span
+                      className={`px-2 py-1 rounded text-sm ${
+                        movement.loanStatus === "active"
+                          ? "bg-yellow-100 text-yellow-800"
+                          : "bg-green-100 text-green-800"
+                      }`}
+                    >
+                      {movement.loanStatus === "active" ? "Activo" : "Devuelto"}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
-
-      {isFormOpen && renderForm()}
     </div>
   );
 }

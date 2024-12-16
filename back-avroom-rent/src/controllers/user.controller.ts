@@ -5,8 +5,7 @@ import { generateToken } from '../utils/jwt.utils';
 import { logger } from '../config/logger.config';
 
 export const loginUser = async (req: Request, res: Response): Promise<void> => {
-  const { email, password } = req.body;
-  console.log(password);
+  const { email } = req.body;
 
   try {
     const user = await User.findOne({ email });
@@ -76,7 +75,6 @@ export const createUser = async (
       username,
       email,
       password,
-      // password: hashedPassword,
       dateCreation: new Date(),
       role,
     });
@@ -104,14 +102,11 @@ export const updateUserByID = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
-  console.log('HILLAAA');
   const { id } = req.params;
   const { username, email, password, role } = req.body;
-  console.log(username);
 
   try {
     const user = await User.findOne({ id });
-    console.log(user);
     if (!user) {
       logger.warn('Usuario no encontrado', { userId: id });
       res.status(404).json({ message: 'Usuario no encontrado' });

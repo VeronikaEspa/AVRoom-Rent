@@ -3,10 +3,10 @@ import {
   validateEnvironmentVariables,
 } from '../utils/env.utils';
 
-const requiredVars = ['BACKEND_URL'];
+const requiredVars = ['NEXT_PUBLIC_BACKEND_URL'];
 
 validateEnvironmentVariables(requiredVars);
 
 export const config = {
-  backUrl: getEnvVariable('BACKEND_URL')
+  backUrl: getEnvVariable('NEXT_PUBLIC_BACKEND_URL')
 };

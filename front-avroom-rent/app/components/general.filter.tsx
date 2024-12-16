@@ -57,35 +57,6 @@ export const GeneralFilter: React.FC<GeneralFilterProps> = ({
           ))}
         </select>
       )}
-      <input
-        type="text"
-        placeholder="Buscar por email..."
-        value={filters.email || ""}
-        onChange={(e) => onFilterChange("email", e.target.value)}
-        className="px-2 py-1 border border-gray-300 rounded"
-      />
-      {filters.availability !== undefined && (
-        <select
-          value={filters.availability || ""}
-          onChange={(e) => onFilterChange("availability", e.target.value)}
-          className="px-2 py-1 border border-gray-300 rounded"
-        >
-          <option value="">Filtrar por disponibilidad</option>
-          <option value="true">Disponible</option>
-          <option value="false">No disponible</option>
-        </select>
-      )}
-      {/* {filters.sortBy !== undefined && (
-        <select
-          value={filters.sortBy || ""}
-          onChange={(e) => onFilterChange("sortBy", e.target.value)}
-          className="px-2 py-1 border border-gray-300 rounded"
-        >
-          <option value="">Ordenar por</option>
-          <option value="name">Nombre</option>
-          <option value="category">Categoría</option>
-        </select>
-      )} */}
     </div>
   );
 };

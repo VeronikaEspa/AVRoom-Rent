@@ -1,11 +1,11 @@
 import { create } from "zustand";
-import { User } from "../utils/types/user.types";
+import { IUser } from "../utils/types/user.types";
 
 interface UserState {
-  users: User[];
+  users: IUser[];
   currentPage: number;
   errorMessage: string;
-  setUsers: (users: User[]) => void;
+  setUsers: (users: IUser[]) => void;
   setCurrentPage: (page: number) => void;
   setErrorMessage: (message: string) => void;
   clearUsers: () => void;

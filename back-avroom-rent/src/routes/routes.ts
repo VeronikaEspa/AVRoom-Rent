@@ -5,48 +5,43 @@ import {
   loginUser,
   updateUserByID,
 } from '../controllers/user.controller';
-import { getAllDevices, createDevice } from '../controllers/device.controller';
+import {
+  getAllDevices,
+  createDevice,
+  getDevice,
+} from '../controllers/device.controller';
 import {
   createMovementByUser,
   getAllMovementByDevice,
   getAllMovement,
   getAllMovementByUser,
-  returnDevice,
+  // returnDevice,
 } from '../controllers/movement.controller';
 import { expressAuthentication } from '../middlewares/auth.middleware';
 
 const router = Router();
 
+// Rutas públicas
 router.post('/login', loginUser);
+router.post('/users', createUser);
 
-router.get('/device', expressAuthentication('jwt'), getAllDevices);
-router.post('/device', expressAuthentication('jwt'), createDevice);
-router.get(
-  '/device/:id/movement',
-  expressAuthentication('jwt'),
-  getAllMovementByDevice,
-);
+// Middleware de autenticación
+router.use(expressAuthentication('jwt'));
 
-router.get('/user', expressAuthentication('jwt'), getAllUsers);
-router.post('/user', expressAuthentication('jwt'), createUser);
-router.put('/user/:id', expressAuthentication('jwt'), updateUserByID);
+// Rutas de usuarios
+router.get('/users', getAllUsers);
+router.put('/users/:id', updateUserByID);
 
-router.get('/movement', expressAuthentication('jwt'), getAllMovement);
-router.get(
-  '/movement/user/:id',
-  expressAuthentication('jwt'),
-  getAllMovementByUser,
-);
-// router.get('/movement/device/:id', expressAuthentication('jwt'), getAllMovementByDevice);
-router.post(
-  '/movement/:id',
-  expressAuthentication('jwt'),
-  createMovementByUser,
-);
-router.post(
-  '/movement/:idMovement/return',
-  expressAuthentication('jwt'),
-  returnDevice,
-);
+// Rutas de dispositivos
+router.get('/devices', getAllDevices);
+router.get('/devices/:id', getDevice);
+router.post('/devices', createDevice);
+router.get('/devices/:id/movements', getAllMovementByDevice);
+
+// Rutas de movimientos
+router.get('/movements', getAllMovement);
+router.get('/movements/users/:id', getAllMovementByUser);
+router.post('/movements/users/:id', createMovementByUser);
+// router.post('/movements/:idMovement/return', returnDevice);
 
 export { router as deviceRoutes };
