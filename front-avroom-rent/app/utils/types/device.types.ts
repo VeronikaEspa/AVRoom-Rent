@@ -6,7 +6,5 @@ export interface Device {
   description: string;
   category: string;
   available: boolean;
-  condition: string;
   loanedTo?: UUIDTypes;
-  lastMaintenance?: Date;
 }

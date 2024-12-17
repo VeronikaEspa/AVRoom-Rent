@@ -17,7 +17,7 @@ interface PaginationProps {
   
     return (
       <div className="flex items-center justify-center gap-2 mt-6">
-        {/* Botón anterior */}
+         Botón anterior */}
         <button
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
@@ -26,7 +26,7 @@ interface PaginationProps {
           <HiChevronLeft className="text-xl" />
         </button>
   
-        {/* Números de página */}
+         Números de página */}
         <div className="flex gap-1">
           {generatePageNumbers().map((page) => (
             <button
@@ -43,7 +43,7 @@ interface PaginationProps {
           ))}
         </div>
   
-        {/* Botón siguiente */}
+         Botón siguiente */}
         <button
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}

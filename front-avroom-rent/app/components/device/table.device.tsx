@@ -23,9 +23,6 @@ export const DevicesTable: React.FC<DevicesTableProps> = ({
             <th className="px-4 py-2 text-left">Descripción</th>
             <th className="px-4 py-2 text-left">Categoría</th>
             <th className="px-4 py-2 text-left">Disponibilidad</th>
-            {userRole === Role.ADMIN && (
-              <th className="px-4 py-2 text-center">Acciones</th>
-            )}
             <th className="px-4 py-2 text-center">Detalles</th>
           </tr>
         </thead>
@@ -67,15 +64,6 @@ export const DevicesTable: React.FC<DevicesTableProps> = ({
                   {device.available ? "Sí" : "No"}
                 </span>
               </td>
-              {userRole === Role.ADMIN && (
-                <td className="px-4 py-3 text-center">
-                  <Link href={`/device/${device.id}`}>
-                    <button className="px-4 py-2 text-primaryColor focus:outline-none">
-                      <HiChevronRight className="text-xl" />
-                    </button>
-                  </Link>
-                </td>
-              )}
               <td className="px-4 py-3 text-center">
                 <Link href={`/device/${device.id}/details`}>
                   <button className="px-4 py-2 text-primaryColor focus:outline-none">

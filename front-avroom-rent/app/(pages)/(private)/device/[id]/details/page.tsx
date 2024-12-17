@@ -84,38 +84,47 @@ export default function DeviceDetailsPage() {
 
   if (isLoading) return <p className="text-gray-500">Loading...</p>;
 
-  // Verificar si existe al menos un movimiento activo
   const hasActiveLoan = movements.some(
     (movement) => movement.loanStatus === "active"
   );
 
   return (
-    <div className="p-6">
-      <div className="flex justify-end mb-4 space-x-2">
-        {!hasActiveLoan ? (
+<div className="p-6">
+      <div className="flex justify-between mb-4">
+        <Link
+          href="/device"
+          className="px-4 py-2 rounded-md text-sm"
+        >
+          {"<< " + "Inventario"}
+        </Link>
+
+        <div className="flex space-x-2">
+          {!hasActiveLoan ? (
+            <Link
+              href={`/device/${id}/loan`}
+              className="bg-primaryColor text-white px-4 py-2 rounded-md text-sm hover:bg-primaryColorDark transition-all"
+            >
+              Añadir Préstamo
+            </Link>
+          ) : (
+            <button
+              disabled
+              className="bg-gray-400 text-white px-4 py-2 rounded-md text-sm cursor-not-allowed opacity-50"
+              title="Ya tienes un préstamo activo para este dispositivo."
+            >
+              Añadir Préstamo
+            </button>
+          )}
+
           <Link
-            href={`/device/${id}/loan`}
+            href={`/device/${id}/loan/return`}
             className="bg-primaryColor text-white px-4 py-2 rounded-md text-sm hover:bg-primaryColorDark transition-all"
           >
-            Añadir Préstamo
+            Devolver
           </Link>
-        ) : (
-          <button
-            disabled
-            className="bg-gray-400 text-white px-4 py-2 rounded-md text-sm cursor-not-allowed"
-            title="Ya tienes un préstamo activo para este dispositivo."
-          >
-            Añadir Préstamo
-          </button>
-        )}
-
-        <Link
-          href={`/device/${id}/loan/return`}
-          className="bg-primaryColor text-white px-4 py-2 rounded-md text-sm hover:bg-primaryColorDark transition-all"
-        >
-          Devolver
-        </Link>
+        </div>
       </div>
+
       <div className="relative flex items-center gap-4 mb-4">
         <div className="absolute bottom-0 left-0 right-0 border-b border-primaryColor z-0"></div>
 
@@ -140,12 +149,16 @@ export default function DeviceDetailsPage() {
           Movimientos
         </button>
       </div>
+
       {activeTab === "detalles" && (
         <DeviceDetails device={device} lastMovementDate={null} />
       )}
       {activeTab === "movimientos" && <Movements movements={movements} />}
+
       {deviceError && <p className="text-red-500 mt-4">{deviceError}</p>}
-      {movementsError && <p className="text-red-500 mt-4">{movementsError}</p>}
+      {movementsError && (
+        <p className="text-red-500 mt-4">{movementsError}</p>
+      )}
     </div>
   );
 }

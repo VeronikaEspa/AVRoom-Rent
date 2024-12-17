@@ -28,12 +28,12 @@ const Sidebar = () => {
           >
             Material
           </a>
-          <a
+           <a
             href="/config"
             className="py-2 px-2 w-full rounded hover:bg-primaryColorDark transition-colors"
           >
             Configuraciones
-          </a>
+          </a> */}
         </div>
       </div>
 

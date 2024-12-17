@@ -7,6 +7,7 @@ import { DevicesTable } from "@/app/components/device/table.device";
 import { Pagination } from "@/app/components/pagination";
 import { GeneralFilter } from "@/app/components/general.filter";
 import { Role } from "@/app/utils/types/user.types";
+import Link from "next/link";
 
 interface DecodedToken {
   role: Role;
@@ -117,17 +118,34 @@ export default function Device() {
       </h1>
       {errorMessage && <p className="text-red-500">{errorMessage}</p>}
 
-      {/* Botón de filtros */}
-      <div className="flex justify-start mb-4">
-        <button
-          onClick={() => setIsFilterOpen(!isFilterOpen)}
-          className="px-4 py-2 bg-primaryColor text-white rounded-md hover:bg-primaryColorDark focus:outline-none"
-        >
-          {isFilterOpen ? "Ocultar Filtros" : "Filtros"}
-        </button>
+      <div className="flex justify-between mb-4">
+        <div>
+          <button
+            onClick={() => setIsFilterOpen(!isFilterOpen)}
+            className="px-4 py-2 bg-primaryColor text-white rounded-md hover:bg-primaryColorDark focus:outline-none transition-colors duration-300"
+          >
+            {isFilterOpen ? "Ocultar Filtros" : "Filtros"}
+          </button>
+        </div>
+
+        {userRole === Role.ADMIN && (
+          <div className="flex space-x-2">
+            <Link
+              href={"/device/register"}
+              className="px-4 py-2 bg-primaryColor text-white rounded-md hover:bg-primaryColorDark transition-colors duration-300"
+            >
+              Añadir Objeto
+            </Link>
+            <Link
+              href={"/movement/register"}
+              className="px-4 py-2 bg-white border border-primaryColor text-primaryColor rounded-md hover:bg-primaryColor hover:text-white transition-colors duration-300"
+            >
+              Añadir Movimiento
+            </Link>
+          </div>
+        )}
       </div>
 
-      {/* Panel de Filtros */}
       {isFilterOpen && (
         <GeneralFilter
           filters={filters}
@@ -136,24 +154,8 @@ export default function Device() {
         />
       )}
 
-      {/* Tabla */}
-      {userRole && (
-        <DevicesTable devices={currentDevices} userRole={userRole} />
-      )}
+      {userRole && <DevicesTable devices={currentDevices} userRole={userRole} />}
 
-      {/* Botones de administrador */}
-      {userRole === Role.ADMIN && (
-        <div className="flex justify-end mb-4">
-          <button className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 mr-2">
-            Añadir Objeto
-          </button>
-          <button className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">
-            Añadir Movimiento
-          </button>
-        </div>
-      )}
-
-      {/* Paginación */}
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}

@@ -47,7 +47,6 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     const res = NextResponse.json({ message: "Registro exitoso" });
 
-    // Configuración de la cookie
     res.headers.append(
       "Set-Cookie",
       serialize("token", token, {
