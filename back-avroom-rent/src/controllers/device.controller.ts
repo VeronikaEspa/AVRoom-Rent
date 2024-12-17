@@ -29,6 +29,7 @@ export const getDevice = async (
 
   try {
     const device = await Device.findOne({ id: id });
+
     if (!device) {
       res.status(404).json({ message: `Dispositivo con ID ${id} no encontrado` });
       return;

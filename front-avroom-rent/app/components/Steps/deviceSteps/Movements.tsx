@@ -21,6 +21,8 @@ export default function Movements({ movements }: MovementsProps) {
     return movements.slice(startIndex, startIndex + itemsPerPage);
   }, [movements, currentPage, itemsPerPage]);
 
+
+
   return (
     <div>
       <div className="my-4">
@@ -39,7 +41,6 @@ export default function Movements({ movements }: MovementsProps) {
                 <th className="px-4 py-2 text-left font-medium">Fecha Esperada Devolución</th>
                 <th className="px-4 py-2 text-left font-medium">Fecha Real Devolución</th>
                 <th className="px-4 py-2 text-left font-medium">Estado</th>
-                <th className="px-4 py-2 text-left font-medium">Tipo</th>
                 <th className="px-4 py-2 text-left font-medium">Descripción</th>
               </tr>
             </thead>
@@ -75,7 +76,6 @@ export default function Movements({ movements }: MovementsProps) {
                       {movement.loanStatus === "active" ? "Activo" : "Completado"}
                     </span>
                   </td>
-                  <td className="px-4 py-2 text-gray-900">{movement.type}</td>
                   <td className="px-4 py-2 text-gray-900">
                     {movement.description || "Sin descripción"}
                   </td>

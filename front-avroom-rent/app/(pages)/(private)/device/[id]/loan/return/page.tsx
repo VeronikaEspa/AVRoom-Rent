@@ -10,13 +10,18 @@ interface JwtPayload {
   role: string;
 }
 
+interface Device {
+  id: string;
+  name: string;
+}
+
 export default function RegisterReturnPage() {
   const { id } = useParams();
   const router = useRouter();
   const [userRole, setUserRole] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
 
-  const [devicesToReturn, setDevicesToReturn] = useState<{ id: string; name: string }[]>([]);
+  const [devicesToReturn, setDevicesToReturn] = useState<Device[]>([]);
 
   const [formData, setFormData] = useState<
     Omit<IMovement, "id" | "loanDate" | "returnDateExpected">
@@ -65,28 +70,48 @@ export default function RegisterReturnPage() {
     if (id && userId) {
       setFormData((prev) => ({
         ...prev,
-        userId: userId
+        userId: userId,
       }));
-      // Obtenemos la lista de artículos a devolver
+
+      // Función para obtener la lista de artículos a devolver
       const fetchDevices = async () => {
         try {
-          const response = await fetch(`/api/movement/${userId}/get`);
+          const response = await fetch(`/api/movement/${userId}/return`);
+
           if (!response.ok) {
             throw new Error("Error al obtener los artículos.");
           }
-          const data = await response.json();
-          setDevicesToReturn(data);
+
+          const data: [string, string][] = await response.json();
+
+          // Transformar el array de arrays a array de objetos
+          const devices: Device[] = data.map(([id, name]) => ({ id, name }));
+
+          // Eliminar duplicados basados en el 'id'
+          const uniqueDevicesMap: { [key: string]: Device } = {};
+          devices.forEach((device) => {
+            if (!uniqueDevicesMap[device.id]) {
+              uniqueDevicesMap[device.id] = device;
+            }
+          });
+
+          const uniqueDevices = Object.values(uniqueDevicesMap);
+
+          setDevicesToReturn(uniqueDevices);
         } catch (err) {
           console.error(err);
           setErrorMessage("No se pudo cargar la lista de artículos.");
         }
       };
+
       fetchDevices();
     }
   }, [id, userId]);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const { name } = e.target;
     let value: string | boolean = e.target.value;
@@ -145,7 +170,9 @@ export default function RegisterReturnPage() {
       <h2 className="text-xl font-bold text-gray-700 mb-6">{pageTitle}</h2>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label className="block text-gray-700 mb-2">Artículo a devolver:</label>
+          <label className="block text-gray-700 mb-2">
+            Artículo a devolver:
+          </label>
           <select
             name="deviceId"
             value={formData.deviceId}
@@ -163,7 +190,9 @@ export default function RegisterReturnPage() {
         </div>
 
         <div>
-          <label className="block text-gray-700 mb-2">Descripción de la devolución:</label>
+          <label className="block text-gray-700 mb-2">
+            Descripción de la devolución:
+          </label>
           <textarea
             name="description"
             value={formData.description}
@@ -175,12 +204,21 @@ export default function RegisterReturnPage() {
         </div>
 
         <div>
-          <label className="block text-gray-700 mb-2">Fecha de Devolución Actual:</label>
+          <label className="block text-gray-700 mb-2">
+            Fecha de Devolución Actual:
+          </label>
           <input
             type="date"
             name="returnDateActual"
-            value={(formData.returnDateActual as Date).toISOString().split("T")[0]}
-            onChange={(e) => handleDateChange("returnDateActual", e.target.value)}
+            disabled
+            value={
+              formData.returnDateActual instanceof Date
+                ? formData.returnDateActual.toISOString().split("T")[0]
+                : ""
+            }
+            onChange={(e) =>
+              handleDateChange("returnDateActual", e.target.value)
+            }
             className="w-full p-3 border rounded"
             required
           />
@@ -198,13 +236,17 @@ export default function RegisterReturnPage() {
             type="submit"
             disabled={isLoading}
             className={`px-4 py-2 text-white rounded ${
-              isLoading ? "bg-gray-400" : "bg-primaryColor hover:bg-primaryColorDark"
+              isLoading
+                ? "bg-gray-400"
+                : "bg-primaryColor hover:bg-primaryColorDark"
             }`}
           >
             {isLoading ? "Guardando..." : "Registrar Devolución"}
           </button>
         </div>
-        {errorMessage && <p className="text-red-500 text-center mt-4">{errorMessage}</p>}
+        {errorMessage && (
+          <p className="text-red-500 text-center mt-4">{errorMessage}</p>
+        )}
       </form>
     </div>
   );

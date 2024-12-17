@@ -40,7 +40,6 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     console.error("Error fetching movements:", error);
 
     if (axios.isAxiosError(error) && error.response?.status === 404) {
-      // If the server returned a 404, return an empty response with 404 status
       return NextResponse.json(
         { message: "Movements not found", data: [] },
         { status: 404 }

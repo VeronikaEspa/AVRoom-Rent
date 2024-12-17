@@ -8,14 +8,13 @@ import Movements from "@/app/components/Steps/deviceSteps/Movements";
 import { IMovementWithUsername } from "@/app/utils/types/movement.types";
 import { Device } from "@/app/utils/types/device.types";
 import { getCookie } from "@/app/utils/functions/cookies";
-import { jwtDecode } from "jwt-decode";
+import jwt from "jsonwebtoken";
 import Link from "next/link";
 
 export default function DeviceDetailsPage() {
   const { id } = useParams();
   const [device, setDevice] = useState<Device | null>(null);
   const [movements, setMovements] = useState<IMovementWithUsername[]>([]);
-  const [lastMovement, setLastMovement] = useState<string | null>(null);
   const [deviceError, setDeviceError] = useState<string | null>(null);
   const [movementsError, setMovementsError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -25,7 +24,7 @@ export default function DeviceDetailsPage() {
     try {
       const token = getCookie("token");
       if (token) {
-        const decoded: { id: string } = jwtDecode(token);
+        const decoded: { id: string } = jwt.decode(token) as { id: string };
         return decoded.id;
       }
       return null;
@@ -58,10 +57,11 @@ export default function DeviceDetailsPage() {
 
         const movementsResponse = await axios.get(`/api/movement/${id}/device`);
         const movements = movementsResponse.data;
+        setMovements(movements);
       } catch (error) {
         console.error("Error fetching movements data:", error);
         setMovementsError("Error fetching movements data.");
-        setMovements([]); // Ensure movements is an empty array on error
+        setMovements([]);
       }
     };
 
@@ -84,15 +84,30 @@ export default function DeviceDetailsPage() {
 
   if (isLoading) return <p className="text-gray-500">Loading...</p>;
 
+  // Verificar si existe al menos un movimiento activo
+  const hasActiveLoan = movements.some(
+    (movement) => movement.loanStatus === "active"
+  );
+
   return (
     <div className="p-6">
-      <div className="flex justify-end mb-4">
-        <Link
-          href={`/device/${id}/loan`}
-          className="bg-primaryColor text-white px-4 py-2 rounded-md text-sm hover:bg-primaryColorDark transition-all"
-        >
-          Añadir Préstamo
-        </Link>
+      <div className="flex justify-end mb-4 space-x-2">
+        {!hasActiveLoan ? (
+          <Link
+            href={`/device/${id}/loan`}
+            className="bg-primaryColor text-white px-4 py-2 rounded-md text-sm hover:bg-primaryColorDark transition-all"
+          >
+            Añadir Préstamo
+          </Link>
+        ) : (
+          <button
+            disabled
+            className="bg-gray-400 text-white px-4 py-2 rounded-md text-sm cursor-not-allowed"
+            title="Ya tienes un préstamo activo para este dispositivo."
+          >
+            Añadir Préstamo
+          </button>
+        )}
 
         <Link
           href={`/device/${id}/loan/return`}
@@ -108,8 +123,8 @@ export default function DeviceDetailsPage() {
           onClick={() => handleTabClick("detalles")}
           className={`px-4 py-2 text-sm font-medium transition-all duration-300 relative z-10 ${
             activeTab === "detalles"
-              ? "border border-green-800 border-b-white bg-white rounded-t text-black"
-              : "border border-green-800 text-gray-500 bg-gray-100 hover:text-black rounded-t"
+              ? "border border-primaryColor border-b-white bg-white rounded-t text-black"
+              : "border border-primaryColor text-gray-500 bg-gray-100 hover:text-black rounded-t"
           }`}
         >
           Detalles del dispositivo
@@ -118,15 +133,15 @@ export default function DeviceDetailsPage() {
           onClick={() => handleTabClick("movimientos")}
           className={`px-4 py-2 text-sm font-medium transition-all duration-300 relative z-10 ${
             activeTab === "movimientos"
-              ? "border border-green-800 border-b-white bg-white rounded-t text-black"
-              : "border border-green-800 text-gray-500 bg-gray-100 hover:text-black rounded-t"
+              ? "border border-primaryColor border-b-white bg-white rounded-t text-black"
+              : "border border-primaryColor text-gray-500 bg-gray-100 hover:text-black rounded-t"
           }`}
         >
           Movimientos
         </button>
       </div>
       {activeTab === "detalles" && (
-        <DeviceDetails device={device} lastMovementDate={lastMovement} />
+        <DeviceDetails device={device} lastMovementDate={null} />
       )}
       {activeTab === "movimientos" && <Movements movements={movements} />}
       {deviceError && <p className="text-red-500 mt-4">{deviceError}</p>}

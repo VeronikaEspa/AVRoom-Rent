@@ -6,7 +6,6 @@ import {
   FaCube,
   FaClock,
   FaTools,
-  FaUser,
 } from "react-icons/fa";
 
 interface DeviceDetailsProps {
@@ -31,7 +30,7 @@ export default function DeviceDetails({ device, lastMovementDate }: DeviceDetail
             {/* Category */}
             <div className="flex items-center">
               <FaTag className="h-5 w-5 text-gray-500 mr-2" />
-              <span className="text-gray-700 font-medium">Categoría:</span> {device.category}
+              <span className="text-gray-700 font-medium">Categoría: </span> {device.category}
             </div>
 
             {/* Availability */}
@@ -41,36 +40,20 @@ export default function DeviceDetails({ device, lastMovementDate }: DeviceDetail
               ) : (
                 <FaTimesCircle className="h-5 w-5 text-red-500 mr-2" />
               )}
-              <span className="text-gray-700 font-medium">Disponible:</span>{" "}
+              <span className="text-gray-700 font-medium">Disponible: </span>{" "}
               {device.available ? "Sí" : "No"}
             </div>
 
             {/* Quantity */}
             <div className="flex items-center">
               <FaCube className="h-5 w-5 text-gray-500 mr-2" />
-              <span className="text-gray-700 font-medium">Condición:</span> {device.condition}
-            </div>
-
-            {/* Loaned To */}
-            <div className="flex items-center">
-              {device.loanedTo ? (
-                <>
-                  <FaUser className="h-5 w-5 text-blue-500 mr-2" />
-                  <span className="text-gray-700 font-medium">Prestado a:</span>{" "}
-                  {device.loanedTo}
-                </>
-              ) : (
-                <>
-                  <FaUser className="h-5 w-5 text-gray-500 mr-2" />
-                  <span className="text-gray-700 font-medium">Prestado a:</span> Ninguno
-                </>
-              )}
+              <span className="text-gray-700 font-medium">Condición: </span> {device.condition}
             </div>
 
             {/* Last Maintenance */}
             <div className="flex items-center">
               <FaTools className="h-5 w-5 text-gray-500 mr-2" />
-              <span className="text-gray-700 font-medium">Último mantenimiento:</span>{" "}
+              <span className="text-gray-700 font-medium">Último mantenimiento: </span>{" "}
               {device.lastMaintenance
                 ? new Date(device.lastMaintenance).toLocaleDateString()
                 : "N/A"}
@@ -79,7 +62,7 @@ export default function DeviceDetails({ device, lastMovementDate }: DeviceDetail
             {/* Latest Movement Date */}
             <div className="flex items-center">
               <FaClock className="h-5 w-5 text-gray-500 mr-2" />
-              <span className="text-gray-700 font-medium">Último movimiento:</span>{" "}
+              <span className="text-gray-700 font-medium">Último movimiento: </span>{" "}
               {lastMovementDate
                 ? new Date(lastMovementDate).toLocaleDateString()
                 : "N/A"}

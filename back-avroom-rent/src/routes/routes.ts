@@ -41,6 +41,7 @@ router.get('/devices/:id/movements', getAllMovementByDevice);
 // Rutas de movimientos
 router.get('/movements', getAllMovement);
 router.get('/movements/users/:id', getAllMovementByUser);
+// router.get('/movements/device/:id', getMovementByDevice);
 router.post('/movements/users/:id', createMovementByUser);
 // router.post('/movements/:idMovement/return', returnDevice);
 
