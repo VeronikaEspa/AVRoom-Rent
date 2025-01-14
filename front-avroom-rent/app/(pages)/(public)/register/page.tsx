@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { IUser, Role } from "@/app/utils/types/user.types";
+import Link from "next/link";
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState<{
@@ -83,6 +84,13 @@ export default function RegisterPage() {
               </div>
             ))}
             <div className="flex justify-end">
+            <Link
+            href={"/login"}
+                className={"px-6 py-2 rounded text-sm transition-all"}
+              >
+                Cancelar
+              </Link>
+
               <button
                 type="submit"
                 disabled={isLoading}
